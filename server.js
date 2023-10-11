@@ -64,7 +64,7 @@ app.post('/projects', async (req, res) => {
         const {name, members, date } = req.body
         const project = new Project ({ name, members, date })
         await project.save()
-        res.status(201).json({ message: 'Project saved successfully' })
+        res.status(201).json({  message: 'Project saved successfully' })
     } catch (error) {
         res.status(500).json({ error: 'Internal server error '})
     }
@@ -79,7 +79,6 @@ app.post('/register' , async (req, res) => {
         // if the username already exits send this message
         if(findUser) {
           return res.status(300).json({message :"User name already exists"}) 
-           
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
