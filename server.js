@@ -27,7 +27,7 @@ const taskSchema = new mongoose.Schema({
 const projectSchema = new mongoose.Schema({
     name: String,
     members: Number,
-    date: Date,
+    date: String,
 })
 
 // define user schema
@@ -119,6 +119,23 @@ app.delete('/projects/:projectId', async (req, res) => {
         res.status(500).json({ message: 'Internal sever error'})
     }
 })
+// API endpoint for editing project
+app.put('/projects/:id', async (req, res) => {
+    const projectId = req.params.id;
+    const { name, members, date } = req.body;
+    try {
+    const project = await Project.findByIdAndUpdate(projectId, { name, members, date }, { new: true });
+    
+        if (!project) {
+          return res.status(404).json({ message: 'Project not found' });
+        }
+    
+        res.status(200).json(project);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+})
 
 
 
@@ -134,17 +151,29 @@ app.get("/task", async (req, res) => {
     }
   });
 
-  app.get("/projects", async(req, res) => {
-    try{
-        const projects = await Project.find()
-        res.json(projects)
+  app.get("/projects", async (req, res) => {
+    try {
+      const projects = await Project.find();
+  
+      // Calculate the daysLeft for each project and add it to the project objects
+    //   projects.forEach((project) => {
+    //     const date = new Date(project.date);
+    //     const currentDate = new Date();
+    //     const differenceInMilliseconds = date - currentDate;
+    //     // Calculate the number of days left
+    //     project.daysLeft = Math.ceil(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+    //   });
+  
+      // Send the entire projects array, including the daysLeft information
+      res.json(projects);
     } catch (err) {
-        res.status(500).json({ error: "Failed to retrieve projects"})
+      res.status(500).json({ error: "Failed to retrieve projects" });
     }
-  })
-
+  });
+  
 
 // start server
-app.listen(process.env.PORT || 3001, () => {
-    console.log('Server started in port 3001');
+app.listen(process.env.PORT , () => {
+  const port = process.env.PORT || 3001;
+    console.log("Server started in port " + port);
 })
